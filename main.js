@@ -31,6 +31,7 @@ locationButton.addEventListener("click", () => {
     getWeather(lat, lon); // Call getWeather only after latlongFetch resolves
     getForecast(lat, lon);
     getRealTimeWeather(lat, lon);
+    getExtra(lat, lon);
   });
 });
 
@@ -42,6 +43,8 @@ refreshButton.addEventListener("click", () => {
   document.querySelector(".refresh").classList.remove("hide");
   getWeather(lat, lon); // Call getWeather with the last known lat/lon, if there is none then we just hide this button altogether
   getForecast(lat, lon);
+  getRealTimeWeather(lat, lon);
+  getExtra(lat, lon);
 });
 
 reloadButton.addEventListener("click", () => {
@@ -56,6 +59,7 @@ reloadButton.addEventListener("click", () => {
     getWeather(lat, lon);
     getForecast(lat, lon);
     getRealTimeWeather(lat, lon);
+    getExtra(lat, lon);
   } else {
     document.querySelector("[get-saved-location]").classList.add("hide");
     document.querySelector(".crystalize").classList.add("hide");
@@ -73,6 +77,7 @@ locationFetch.addEventListener("click", () => {
       getWeather(lat, lon);
       getForecast(lat, lon);
       getRealTimeWeather(lat, lon);
+      getExtra(lat, lon);
     },
     (error) => {
       console.error("Error getting location:", error.message);
@@ -137,15 +142,15 @@ function getWeather(lat, lon) {
       //either openweatherAPI is drunk or there is something wrong on my end, no way the temperatures are all the same
       const location = data.name;
       const temp = Math.round(data.main.temp);
-      const tempmax = Math.round(data.main.temp_max);
-      const tempmin = Math.round(data.main.temp_min);
+      // const tempmax = Math.round(data.main.temp_max); //until the current weather can return something else rather than 3 same values
+      // const tempmin = Math.round(data.main.temp_min);
       const realfeel = Math.round(data.main.feels_like);
       document.querySelector(".electro-charged").classList.remove("hide");
       document.querySelector("#locationName").textContent = location;
       document.querySelector("#condition").textContent = weather;
       document.querySelector("#temperature").textContent = `${temp}°C`; //because fuck imperial
-      document.querySelector("#tempmaxmin").textContent =
-        `${tempmax}°C` + " / " + `${tempmin}°C`;
+      // document.querySelector("#tempmaxmin").textContent =
+      //   `${tempmax}°C` + " / " + `${tempmin};
       document.querySelector("#feelslike").textContent =
         "RealFeel: " + `${realfeel}°C`;
       document.querySelector(".crystalize").classList.add("hide");
@@ -156,6 +161,47 @@ function getWeather(lat, lon) {
       document.querySelector(".crystalize").classList.add("hide");
       document.querySelector(".electro-charged").classList.remove("hide");
       document.querySelector(".refresh").classList.remove("hide");
+    });
+}
+
+function getExtra(lat, lon) {
+  document.querySelector(".weatherforecast").innerHTML = ""; // Clear previous forecast data
+  document.querySelector(".crystalize").classList.remove("hide");
+  fetch(
+    `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=hourly,minutely,alerts&appid=${apiKey}&units=metric`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      if (data.cod !== 200) {
+        document.querySelector(".electro-charged").classList.remove("hide");
+      }
+      const humidity = Math.round(data.current.humidity);
+      const wind = Math.round(data.current.wind_speed);
+      const uvi = Math.round(data.current.uvi);
+      const dew = Math.round(data.current.dew_point);
+      const sunrise = new Date(data.current.sunrise * 1000).toLocaleTimeString(
+        "en-GB",
+        { hour: "2-digit", minute: "2-digit", hour12: false }
+      );
+      const sunset = new Date(data.current.sunset * 1000).toLocaleTimeString(
+        "en-GB",
+        { hour: "2-digit", minute: "2-digit", hour12: false }
+      );
+
+      document.querySelector(".humidity").textContent =
+        "Humidity: " + `${humidity}%`;
+      document.querySelector(".wind").textContent =
+        "Wind speed: " + `${wind} km/h`;
+      document.querySelector(".uvi").textContent = "UV Index: " + `${uvi}`;
+      document.querySelector(".dewpoint").textContent = "Dew point: " + `${dew}°C`;
+      document.querySelector(".sunrise").textContent =
+        "Sunrise: " + `${sunrise}`;
+      document.querySelector(".sunset").textContent = "Sunset: " + `${sunset}`;
+    })
+    .catch((error) => {
+      console.error("Error fetching extra weather data:", error);
+      document.querySelector(".crystalize").classList.add("hide");
     });
 }
 
@@ -227,7 +273,8 @@ function getForecast(lat, lon) {
   }
 }
 
-function getRealTimeWeather(lat,lon) {
+function getRealTimeWeather(lat, lon) {
+  // temporary measure for now because for some fucking reason i cant get the graph to work
   document.querySelector(".realtime").innerHTML = ""; // Clear previous MinuteCast data
   document.querySelector(".crystalize").classList.remove("hide");
   fetch(
@@ -240,9 +287,10 @@ function getRealTimeWeather(lat,lon) {
         document.querySelector(".electro-charged").classList.remove("hide");
       }
       data.minutely.forEach((minute) => {
-        const time = new Date(minute.dt * 1000).toLocaleTimeString([], {
+        const time = new Date(minute.dt * 1000).toLocaleTimeString("en-GB", {
           hour: "2-digit",
           minute: "2-digit",
+          hour12: false,
         });
         const precipitation = Math.round(minute.precipitation * 100) / 100; // Round to 2 decimal places
 
@@ -250,7 +298,7 @@ function getRealTimeWeather(lat,lon) {
         console.log(`Time: ${time}, Precipitation: ${precipitation}mm`);
         document.querySelector(".realtime").innerHTML += `
           <div class="minute-details">
-            <p>${time}: ${precipitation}mm</p>
+            <p><h1>${time}</h1>: ${precipitation}mm</p>
           </div>
         `;
       });
@@ -260,7 +308,6 @@ function getRealTimeWeather(lat,lon) {
       document.querySelector(".crystalize").classList.add("hide");
     });
 }
-
 
 function saveData() {
   const locationName = document.querySelector("#locationName").textContent;
@@ -283,7 +330,8 @@ function loadData() {
     lon = parseFloat(savedLon);
     getWeather(lat, lon);
     getForecast(lat, lon);
-    getRealTimeWeather(lat,lon);
+    getRealTimeWeather(lat, lon);
+    getExtra(lat, lon);
   }
   if (
     !localStorage.getItem("locationName") &&
