@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tiny Weather viewer</title>
     <link rel="stylesheet" href="./weather.css" />
+
   </head>
   <body>
     <div class="container">
@@ -48,11 +49,18 @@
               <button clear-location>Clear save</button>
             </div>
           </div>
-          <div class="realtime"></div>
+          <div class="realtime">
+            <div class="chartinfo">
+              <h3>Rainfall prediction</h3>
+              <p></p>
+            </div>
+            <canvas id="rainChart" width="400" height="400"></canvas>
+          </div>
         </div>
         <div class="weatherforecast"></div>
       </div>
     </div>
     <script src="./main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
   </body>
 </html>

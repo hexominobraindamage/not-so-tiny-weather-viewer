@@ -11,6 +11,7 @@ const clearButton = document.querySelector("[clear-location]");
 const reloadButton = document.querySelector("[get-saved-location]");
 
 let lat, lon; // Declare global variables for latitude and longitude
+let tempmax, tempmin; // Declare global variables for max and min temperature
 
 let statecode = ""; // Declare statecode variable
 let countrycode = ""; // Declare countrycode variable
@@ -29,6 +30,7 @@ locationButton.addEventListener("click", () => {
   latlongFetch(cityname, statecode, countrycode).then(() => {
     getWeather(lat, lon); // Call getWeather only after latlongFetch resolves
     getForecast(lat, lon);
+    getRealTimeWeather(lat, lon);
   });
 });
 
@@ -39,7 +41,7 @@ refreshButton.addEventListener("click", () => {
   document.querySelector(".crystalize").classList.add("hide");
   document.querySelector(".refresh").classList.remove("hide");
   getWeather(lat, lon); // Call getWeather with the last known lat/lon, if there is none then we just hide this button altogether
-  getForecast(lat, lon); 
+  getForecast(lat, lon);
 });
 
 reloadButton.addEventListener("click", () => {
@@ -53,12 +55,12 @@ reloadButton.addEventListener("click", () => {
     lon = parseFloat(savedLon);
     getWeather(lat, lon);
     getForecast(lat, lon);
+    getRealTimeWeather(lat, lon);
   } else {
-document.querySelector("[get-saved-location]").classList.add("hide");
+    document.querySelector("[get-saved-location]").classList.add("hide");
     document.querySelector(".crystalize").classList.add("hide");
   }
-}
-);
+});
 
 locationFetch.addEventListener("click", () => {
   document.querySelector(".crystalize").classList.remove("hide");
@@ -70,6 +72,7 @@ locationFetch.addEventListener("click", () => {
 
       getWeather(lat, lon);
       getForecast(lat, lon);
+      getRealTimeWeather(lat, lon);
     },
     (error) => {
       console.error("Error getting location:", error.message);
@@ -115,7 +118,7 @@ async function latlongFetch(cityname, statecode, countrycode) {
 }
 
 function getWeather(lat, lon) {
-    document.querySelector(".weatherforecast").innerHTML = ""; // Clear previous forecast data
+  document.querySelector(".weatherforecast").innerHTML = ""; // Clear previous forecast data
   document.querySelector(".crystalize").classList.remove("hide");
   fetch(
     `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
@@ -137,7 +140,6 @@ function getWeather(lat, lon) {
       const tempmax = Math.round(data.main.temp_max);
       const tempmin = Math.round(data.main.temp_min);
       const realfeel = Math.round(data.main.feels_like);
-      console.log();
       document.querySelector(".electro-charged").classList.remove("hide");
       document.querySelector("#locationName").textContent = location;
       document.querySelector("#condition").textContent = weather;
@@ -215,19 +217,21 @@ function getForecast(lat, lon) {
       document.querySelector(".electro-charged").classList.remove("hide");
       document.querySelector(".refresh").classList.remove("hide");
     });
-    if (!localStorage.getItem("locationName") && !localStorage.getItem("latlong")) {
-      clearButton.classList.add("hide");
-    }
-    else {
-      clearButton.classList.remove("hide");
-    }    
+  if (
+    !localStorage.getItem("locationName") &&
+    !localStorage.getItem("latlong")
+  ) {
+    clearButton.classList.add("hide");
+  } else {
+    clearButton.classList.remove("hide");
+  }
 }
 
-function getRealTimeWeather(){
+function getRealTimeWeather(lat,lon) {
   document.querySelector(".realtime").innerHTML = ""; // Clear previous MinuteCast data
   document.querySelector(".crystalize").classList.remove("hide");
   fetch(
-    `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=hourly,current,,alerts&appid=${apiKey}&units=metric`
+    `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=hourly,current,alerts&appid=${apiKey}&units=metric`
   )
     .then((response) => response.json())
     .then((data) => {
@@ -235,6 +239,21 @@ function getRealTimeWeather(){
       if (data.cod !== 200) {
         document.querySelector(".electro-charged").classList.remove("hide");
       }
+      data.minutely.forEach((minute) => {
+        const time = new Date(minute.dt * 1000).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const precipitation = Math.round(minute.precipitation * 100) / 100; // Round to 2 decimal places
+
+        // Use the time and precipitation values (e.g., log them or display them in the UI)
+        console.log(`Time: ${time}, Precipitation: ${precipitation}mm`);
+        document.querySelector(".realtime").innerHTML += `
+          <div class="minute-details">
+            <p>${time}: ${precipitation}mm</p>
+          </div>
+        `;
+      });
     })
     .catch((error) => {
       console.error("Error fetching real-time weather data:", error);
@@ -243,15 +262,14 @@ function getRealTimeWeather(){
 }
 
 
-
-function saveData(){
-const locationName = document.querySelector("#locationName").textContent;
-const latlong = `${lat},${lon}`;
-localStorage.setItem("locationName", locationName);
-localStorage.setItem("latlong", latlong);
-alert("Location saved successfully!");
-document.querySelector("[clear-location]").classList.remove("hide"); // Show the refresh button after saving
-document.querySelector("[get-saved-location]").classList.remove("hide");
+function saveData() {
+  const locationName = document.querySelector("#locationName").textContent;
+  const latlong = `${lat},${lon}`;
+  localStorage.setItem("locationName", locationName);
+  localStorage.setItem("latlong", latlong);
+  alert("Location saved successfully!");
+  document.querySelector("[clear-location]").classList.remove("hide"); // Show the refresh button after saving
+  document.querySelector("[get-saved-location]").classList.remove("hide");
 }
 
 function loadData() {
@@ -265,24 +283,25 @@ function loadData() {
     lon = parseFloat(savedLon);
     getWeather(lat, lon);
     getForecast(lat, lon);
+    getRealTimeWeather(lat,lon);
   }
-  if (!localStorage.getItem("locationName") && !localStorage.getItem("latlong")) {
+  if (
+    !localStorage.getItem("locationName") &&
+    !localStorage.getItem("latlong")
+  ) {
     clearButton.classList.add("hide");
-  }
-  else {
+  } else {
     clearButton.classList.remove("hide");
-  }    
-}// Call loadData on page load to check for saved data
+  }
+} // Call loadData on page load to check for saved data
 
-function clearSave(){
+function clearSave() {
   localStorage.removeItem("locationName");
   localStorage.removeItem("latlong");
   locationInput.value = ""; // Clear the input field
   document.querySelector(".refresh").classList.remove("hide"); // Hide the refresh button
 
-    clearButton.classList.add("hide");
-    document.querySelector("[get-saved-location]").classList.add("hide");
-    alert("Location cleared successfully!");
-  }    
-
-
+  clearButton.classList.add("hide");
+  document.querySelector("[get-saved-location]").classList.add("hide");
+  alert("Location cleared successfully!");
+}
