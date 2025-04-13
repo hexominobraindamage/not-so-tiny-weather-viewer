@@ -1,0 +1,144 @@
+body {
+  background: url("bg.jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: -1;
+}
+h1 {
+  text-align: center;
+  font-size: 50px;
+  margin-top: 20px;
+}
+
+.weathercontainer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 50px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 70px 70px;
+  padding: 20px;
+}
+.weathercontainer img {
+  width: auto;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .weathercontainer {
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+  }
+  .weathercontainer img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.aggregate {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.locationfinder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  height: 80px;
+  flex-direction: column;
+}
+
+input {
+  width: 300px;
+  height: 40px;
+  border-radius: 5px;
+  border: none;
+  padding-left: 10px;
+  font-size: 16px;
+}
+
+button {
+  width: 100px;
+  height: 40px;
+  margin: 5px;
+  border-radius: 5px;
+  border: none;
+  background-color: #4c81af;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+.burgeon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 80px;
+}
+.hyperbloom {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 80px;
+}
+.quicken {
+  display: flex;
+  justify-content: left;
+}
+.hide {
+  display: none;
+}
+#temperature {
+  font-size: 40px;
+  font-weight: bold;
+
+  margin-top: 20px;
+}
+.overloaded {
+  text-align: left;
+  margin-left: 20px;
+}
+#tempmaxmin {
+  font-size: x-large;
+  font-weight: bold;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  font-size: 20px;
+}
+
+.weatherforecast {
+text-align: center;
+  flex-direction: row;
+  display: flex;
+  align-self: center;
+  justify-content: space-between;
+  margin-top: 50px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 70px 70px;
+  padding: 20px;
+}
+.weatherforecast img {
+  width: auto;
+  height: auto;
+}
