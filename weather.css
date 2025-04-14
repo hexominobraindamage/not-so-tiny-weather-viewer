@@ -1,9 +1,10 @@
 body {
-  background: url("bg.jpeg");
+  background:   url("bg.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   color: white;
-  font-family: "Mochiy Pop P One", sans-serif;
+  font-family: "Mochiy Pop P One";
+  font-size: smaller;
 }
 body::before {
   content: "";
@@ -15,7 +16,6 @@ body::before {
   background-color: rgba(0, 0, 0, 0.7);
   z-index: -1;
 }
-
 .title{
   display:flex;
   justify-content: center;
@@ -25,6 +25,7 @@ width:100px;
 height: 100px;
 margin-top: -10px;
 }
+
 h1 {
   text-align: center;
   font-size: 50px;
@@ -128,7 +129,7 @@ button {
   font-weight: bold;
 }
 
-.details {
+.weatherforecast .details {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -139,7 +140,8 @@ button {
 .weatherforecast {
   text-align: center;
   flex-direction: row;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
   align-self: center;
   justify-content: space-between;
   margin-top: 50px;
@@ -147,6 +149,18 @@ button {
   background-color: rgba(255, 255, 255, 0.2);
   margin: 70px 70px;
   padding: 20px;
+}
+.weatherforecast .details{
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 5px;
+  border-radius: 10px;
+  line-height: 0.9;
+}
+
+.weatherforecast .details:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+  transition: background-color 0.3s ease;
 }
 .weatherforecast img {
   width: auto;
@@ -168,18 +182,66 @@ button {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 17px;
+
 }
 .tartaglia {
   align-items: center;
   justify-content: space-evenly;
   display: flex;
   flex-direction: column;
+  
 }
 
 .minute-details{
   font-size: 10px;
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: center;
 }
 
 .minute-details h1{
-  font-size: 12px;
+  font-size: 11px;
+
+}
+
+.hourlyforecast {
+display: grid;
+grid-template-columns: repeat(6, 1fr);
+margin-top: 50px;
+border-radius: 10px;
+background-color: rgba(255, 255, 255, 0.2);
+margin: 70px 70px;
+padding: 20px;
+}
+
+.hourlyforecast .details
+{
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 5px;
+  border-radius: 10px;
+  line-height: 0.9;
+}
+
+.hourlyforecast .details:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+  transition: background-color 0.3s ease;
+}
+.hourlyforecast img {
+  width: auto;
+  height: auto;
+
+}
+.hourlyforecast h2 {
+  font-size: 15px;
+  font-weight: 1000;
+}
+.hourlyforecast h3 {
+  font-size: 18px;
+}
+
+.hourlyforecast h4 {
+  font-size: 15px;
+  font-weight: 10;
 }

@@ -4,12 +4,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tiny Weather viewer</title>
     <link rel="stylesheet" href="./weather.css" />
-    <link rel="shortcut icon" href="./icon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="./icon.ico" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
   </head>
   <body>
     <div class="container">
-      <div class="title"><img src="./icon.png" alt="">
-      <h1>Tiny Weather viewer</h1></div>
+      <div class="title">
+        <img src="./icon.png" alt="" />
+        <h1>Tiny Weather viewer</h1>
+      </div>
       <div class="locationfinder">
         <div class="burgeon">
           <input
@@ -43,7 +48,7 @@
               </div>
             </div>
             <p id="condition">-?-</p>
-            <br>
+            <br />
             <div class="extrastuff"><p class="humidity">Humidity: -?-</p></div>
             <div class="extrastuff"><p class="wind">Wind Speed: -?-</p></div>
             <div class="extrastuff"><p class="uvi">UV Index: -?-</p></div>
@@ -61,6 +66,9 @@
             <div class="realtime"></div>
           </div>
         </div>
+
+        <div class="hourlyforecast"></div>
+
         <div class="weatherforecast"></div>
       </div>
     </div>

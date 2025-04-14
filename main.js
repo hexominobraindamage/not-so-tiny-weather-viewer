@@ -21,17 +21,19 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 // Call loadData on page load to check for saved data
 locationInput.addEventListener("input", (e) => {
-  const cityname = e.target.value.trim().toLowerCase();
+  const cityname = e.target.value;
   locationInput.value = cityname;
 });
 locationButton.addEventListener("click", () => {
   document.querySelector(".crystalize").classList.remove("hide");
-  const cityname = locationInput.value.trim().toLowerCase();
+  const cityname = locationInput.value;
   latlongFetch(cityname, statecode, countrycode).then(() => {
     getWeather(lat, lon); // Call getWeather only after latlongFetch resolves
     getForecast(lat, lon);
     getRealTimeWeather(lat, lon);
     getExtra(lat, lon);
+    getHourlyWeather(lat, lon);
+    locationInput.value = ""; // Clear the input field after fetching
   });
 });
 
@@ -45,6 +47,7 @@ refreshButton.addEventListener("click", () => {
   getForecast(lat, lon);
   getRealTimeWeather(lat, lon);
   getExtra(lat, lon);
+  getHourlyWeather(lat, lon);
 });
 
 reloadButton.addEventListener("click", () => {
@@ -60,6 +63,7 @@ reloadButton.addEventListener("click", () => {
     getForecast(lat, lon);
     getRealTimeWeather(lat, lon);
     getExtra(lat, lon);
+    getHourlyWeather(lat, lon);
   } else {
     document.querySelector("[get-saved-location]").classList.add("hide");
     document.querySelector(".crystalize").classList.add("hide");
@@ -78,6 +82,7 @@ locationFetch.addEventListener("click", () => {
       getForecast(lat, lon);
       getRealTimeWeather(lat, lon);
       getExtra(lat, lon);
+      getHourlyWeather(lat, lon);
     },
     (error) => {
       console.error("Error getting location:", error.message);
@@ -141,12 +146,15 @@ function getWeather(lat, lon) {
       ).src = `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
       //either openweatherAPI is drunk or there is something wrong on my end, no way the temperatures are all the same
       const location = data.name;
+      const city = data.sys.country; // City name and country code
       const temp = Math.round(data.main.temp);
       // const tempmax = Math.round(data.main.temp_max); //until the current weather can return something else rather than 3 same values
       // const tempmin = Math.round(data.main.temp_min);
       const realfeel = Math.round(data.main.feels_like);
       document.querySelector(".electro-charged").classList.remove("hide");
-      document.querySelector("#locationName").textContent = location;
+      document.querySelector("#locationName").textContent =
+        location + ", " + city;
+
       document.querySelector("#condition").textContent = weather;
       document.querySelector("#temperature").textContent = `${temp}°C`; //because fuck imperial
       // document.querySelector("#tempmaxmin").textContent =
@@ -194,7 +202,8 @@ function getExtra(lat, lon) {
       document.querySelector(".wind").textContent =
         "Wind speed: " + `${wind} km/h`;
       document.querySelector(".uvi").textContent = "UV Index: " + `${uvi}`;
-      document.querySelector(".dewpoint").textContent = "Dew point: " + `${dew}°C`;
+      document.querySelector(".dewpoint").textContent =
+        "Dew point: " + `${dew}°C`;
       document.querySelector(".sunrise").textContent =
         "Sunrise: " + `${sunrise}`;
       document.querySelector(".sunset").textContent = "Sunset: " + `${sunset}`;
@@ -225,7 +234,7 @@ function getForecast(lat, lon) {
       if (data.cod !== 200) {
         document.querySelector(".electro-charged").classList.remove("hide");
       }
-      data.daily.forEach((daily) => {
+      data.daily.slice(0, 7).forEach((daily) => {
         const weather = daily.weather[0].description;
         const weatherIcon = daily.weather[0].icon;
         const dateOfWeek = new Date(daily.dt * 1000).toLocaleDateString(
@@ -273,6 +282,73 @@ function getForecast(lat, lon) {
   }
 }
 
+function getHourlyWeather(lat, lon) {
+  document.querySelector(".hourlyforecast").innerHTML = ""; // Clear previous forecast data
+  document.querySelector(".crystalize").classList.remove("hide");
+  fetch(
+    `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=daily,current,minutely,alerts&appid=${apiKey}&units=metric`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      if (data.cod !== 200) {
+        document.querySelector(".electro-charged").classList.remove("hide");
+      }
+      data.hourly.slice(0, 12).forEach((hourly) => {
+        // Fetch only the first 12 hours
+        const weather = hourly.weather[0].description;
+        const weatherIcon = hourly.weather[0].icon;
+        const time = new Date(hourly.dt * 1000).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+        const day = new Date(hourly.dt * 1000).getDate();
+        const month = new Date(hourly.dt * 1000).toLocaleString("default", {
+          month: "short",
+        });
+        const foretemp = Math.round(hourly.temp);
+        const forefeel = Math.round(hourly.feels_like);
+        const forehumidity = Math.round(hourly.humidity);
+        const forechance = Math.round(hourly.pop * 100);
+        let forerain = "";
+        if (forechance > 0 && hourly.rain) {
+          forerain = "(" + Math.round(hourly.rain["1h"] * 100) / 100 + "mm)";
+        }
+
+        // Append forecast details
+        document.querySelector(".hourlyforecast").innerHTML += `
+    <div class="details">
+      <h2>${time}</h2>
+      <p>${day} ${month}<p>
+      <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="${weather}">
+      <h3>${weather}</h3>
+      <h4>${foretemp}°C</h4>
+      <h4>RealFeel: ${forefeel}°C</h4>
+      <h4>Humidity: ${forehumidity}%</h4>
+      <h4>${forechance}% precip ${forerain}</h4>
+    </div>
+  `;
+      });
+
+      document.querySelector(".crystalize").classList.add("hide");
+    })
+    .catch((error) => {
+      console.error("Error fetching weather data:", error);
+      document.querySelector(".crystalize").classList.add("hide");
+      document.querySelector(".electro-charged").classList.remove("hide");
+      document.querySelector(".refresh").classList.remove("hide");
+    });
+  if (
+    !localStorage.getItem("locationName") &&
+    !localStorage.getItem("latlong")
+  ) {
+    clearButton.classList.add("hide");
+  } else {
+    clearButton.classList.remove("hide");
+  }
+}
+
 function getRealTimeWeather(lat, lon) {
   // temporary measure for now because for some fucking reason i cant get the graph to work
   document.querySelector(".realtime").innerHTML = ""; // Clear previous MinuteCast data
@@ -293,12 +369,14 @@ function getRealTimeWeather(lat, lon) {
           hour12: false,
         });
         const precipitation = Math.round(minute.precipitation * 100) / 100; // Round to 2 decimal places
-
-        // Use the time and precipitation values (e.g., log them or display them in the UI)
-        console.log(`Time: ${time}, Precipitation: ${precipitation}mm`);
+        const maxPrecipitation = Math.max(
+          ...data.minutely.map((minute) => minute.precipitation)
+        );
+        const transparency = precipitation / maxPrecipitation; // Calculate transparency based on max precipitation
+        const color = `rgba(65,245,114,${transparency})`; // Set color based on precipitation
         document.querySelector(".realtime").innerHTML += `
-          <div class="minute-details">
-            <p><h1>${time}</h1>: ${precipitation}mm</p>
+          <div class="minute-details" style="background-color: ${color};">
+            <h1>${time}</h1> <p>${precipitation}mm</p>
           </div>
         `;
       });
@@ -332,6 +410,7 @@ function loadData() {
     getForecast(lat, lon);
     getRealTimeWeather(lat, lon);
     getExtra(lat, lon);
+    getHourlyWeather(lat, lon);
   }
   if (
     !localStorage.getItem("locationName") &&
