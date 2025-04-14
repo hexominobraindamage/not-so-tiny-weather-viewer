@@ -108,7 +108,7 @@ async function latlongFetch(cityname, statecode, countrycode) {
   document.querySelector(".crystalize").classList.remove("hide");
   try {
     const response = await fetch(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${cityname}${stateParam}${countryParam}&limit=5&appid=${apiKey}`
+      `https://api.openweathermap.org/geo/1.0/direct?q=${cityname}${stateParam}${countryParam}&limit=5&appid=${apiKey}`
     );
     const latlong = await response.json();
     if (latlong.length > 0) {
