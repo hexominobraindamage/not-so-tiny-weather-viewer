@@ -357,6 +357,7 @@ function getHourlyWeather(lat, lon) {
     !localStorage.getItem("locationName") &&
     !localStorage.getItem("latlong")
   ) {
+    reloadButton.classList.add("hide");
     clearButton.classList.add("hide");
   } else {
     clearButton.classList.remove("hide");
@@ -430,6 +431,15 @@ function loadData() {
     !localStorage.getItem("locationName") &&
     !localStorage.getItem("latlong")
   ) {
+lat = 35.021041;
+lon = 135.7556075;
+
+    getWeather(lat, lon);
+    getForecast(lat, lon);
+    getRealTimeWeather(lat, lon);
+    getExtra(lat, lon);
+    getHourlyWeather(lat, lon);
+    reloadButton.classList.add("hide");
     clearButton.classList.add("hide");
   } else {
     clearButton.classList.remove("hide");

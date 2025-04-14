@@ -247,3 +247,11 @@ padding: 20px;
   font-size: 15px;
   font-weight: 10;
 }
+
+.footer a{
+  color: cyan;
+}
+.footer a:hover{
+  color: white;
+cursor: crosshair
+}
