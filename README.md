@@ -1,3 +1,2 @@
-A simple weather viewing webpage with geolocation fetching.
-<br>
-For MindX JSA course, checkpoint project 2.
+<h1>(Not so) Tiny Weather viewer</h1>
+A simple website for weather viewing.
