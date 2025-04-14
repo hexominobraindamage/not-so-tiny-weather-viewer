@@ -163,7 +163,7 @@ button {
   transition: background-color 0.3s ease;
 }
 .weatherforecast img {
-  width: auto;
+  width: 75px;
   height: auto;
 }
 .weatherforecast h2 {
@@ -181,7 +181,7 @@ button {
 .realtime {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  gap: 17px;
+  gap: 10px;
 
 }
 .tartaglia {
@@ -207,7 +207,7 @@ button {
 
 .hourlyforecast {
 display: grid;
-grid-template-columns: repeat(6, 1fr);
+grid-template-columns: repeat(5, 1fr);
 margin-top: 50px;
 border-radius: 10px;
 background-color: rgba(255, 255, 255, 0.2);
@@ -217,19 +217,21 @@ padding: 20px;
 
 .hourlyforecast .details
 {
+  display: flex;
+  flex-direction: row ;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.2);
   margin: 5px;
   border-radius: 10px;
-  line-height: 0.9;
+  padding: 5px;
 }
 
 .hourlyforecast .details:hover {
   background-color: rgba(255, 255, 255, 0.4);
   transition: background-color 0.3s ease;
 }
-.hourlyforecast img {
-  width: auto;
+.hourlyforecast .details img {
+  width: 60px;
   height: auto;
 
 }

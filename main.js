@@ -139,6 +139,15 @@ function getWeather(lat, lon) {
       if (data.cod !== 200) {
         document.querySelector(".electro-charged").classList.remove("hide");
       }
+      const time = new Date(data.dt * 1000).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+      const day = new Date(data.dt * 1000).getDate();
+      const month = new Date(data.dt * 1000).toLocaleString("default", {
+        month: "long",
+      });
       const weather = data.weather[0].description;
       const weatherIcon = data.weather[0].icon; // Weather icon code, will convert to actual icons
       document.querySelector(
@@ -152,6 +161,7 @@ function getWeather(lat, lon) {
       // const tempmin = Math.round(data.main.temp_min);
       const realfeel = Math.round(data.main.feels_like);
       document.querySelector(".electro-charged").classList.remove("hide");
+      document.querySelector("#dt").textContent = month + " "+ day + " @ "+ time;
       document.querySelector("#locationName").textContent =
         location + ", " + city;
 
@@ -255,7 +265,7 @@ function getForecast(lat, lon) {
         document.querySelector(".weatherforecast").innerHTML += `
     <div class="details">
       <h2>${dateOfWeek}</h2>
-      <p>${day} ${month}<p>
+      <p>${month} ${day}<p>
       <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="${weather}">
       <h3>${weather}</h3>
       <h4>${tempmax}°C</h4>
@@ -294,8 +304,8 @@ function getHourlyWeather(lat, lon) {
       if (data.cod !== 200) {
         document.querySelector(".electro-charged").classList.remove("hide");
       }
-      data.hourly.slice(0, 12).forEach((hourly) => {
-        // Fetch only the first 12 hours
+      data.hourly.slice(0, 25).forEach((hourly) => {
+        // Debating whether we should keep it 24 or 12
         const weather = hourly.weather[0].description;
         const weatherIcon = hourly.weather[0].icon;
         const time = new Date(hourly.dt * 1000).toLocaleTimeString("en-US", {
@@ -308,7 +318,6 @@ function getHourlyWeather(lat, lon) {
           month: "short",
         });
         const foretemp = Math.round(hourly.temp);
-        const forefeel = Math.round(hourly.feels_like);
         const forehumidity = Math.round(hourly.humidity);
         const forechance = Math.round(hourly.pop * 100);
         let forerain = "";
@@ -319,14 +328,19 @@ function getHourlyWeather(lat, lon) {
         // Append forecast details
         document.querySelector(".hourlyforecast").innerHTML += `
     <div class="details">
+    <div class="sector1">
       <h2>${time}</h2>
       <p>${day} ${month}<p>
+      </div>
+      <div class="sector2">
       <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="${weather}">
-      <h3>${weather}</h3>
-      <h4>${foretemp}°C</h4>
-      <h4>RealFeel: ${forefeel}°C</h4>
-      <h4>Humidity: ${forehumidity}%</h4>
+      
+      <h3>${foretemp}°C</h3>
+      </div>
+      <div class="sector3">
+      <h4>${forehumidity}% humid</h4>
       <h4>${forechance}% precip ${forerain}</h4>
+      </div>
     </div>
   `;
       });
