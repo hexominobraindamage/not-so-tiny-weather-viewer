@@ -16,8 +16,18 @@ let tempmax, tempmin; // Declare global variables for max and min temperature
 let statecode = ""; // Declare statecode variable
 let countrycode = ""; // Declare countrycode variable
 
+function checkScreenWidth() {
+  const screenWidth = window.innerWidth;
+  if (screenWidth <= 768) {
+    document.querySelector(".warn").innerHTML = `<p>It seems you are using a mobile device. Currently the styling is broken for mobile devices, please use the website on a PC for the best experience. </p>`;
+    document.querySelector(".warnfooter").innerHTML = `<p>Now that you have scrolled all the way down to here: DO YOU SEE HOW BROKEN IT IS??? </p>`;
+  }
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
-  loadData();
+  loadData()
+  checkScreenWidth();
 });
 // Call loadData on page load to check for saved data
 locationInput.addEventListener("input", (e) => {
@@ -257,6 +267,11 @@ function getForecast(lat, lon) {
         const month = new Date(daily.dt * 1000).toLocaleString("default", {
           month: "long",
         });
+        const rainchance = Math.round(daily.pop * 100);
+        let rain = "";
+        if (rainchance > 0 && daily.rain) {
+          rain = "(" + Math.round(daily.rain * 100) / 100 + "mm)";
+        }
         const tempmax = Math.round(daily.temp.max);
         const tempmin = Math.round(daily.temp.min);
         console.log();
@@ -270,6 +285,7 @@ function getForecast(lat, lon) {
       <h3>${weather}</h3>
       <h4>${tempmax}°C</h4>
       <h4>${tempmin}°C</h4>
+      <h4>${rainchance}% precip ${rain}</h4>
     </div>
   `;
       });

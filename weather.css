@@ -16,6 +16,13 @@ body::before {
   background-color: rgba(0, 0, 0, 0.7);
   z-index: -1;
 }
+
+.warn p{
+  display: none;
+}
+.warnfooter p{
+  display: none;
+}
 .title{
   display:flex;
   justify-content: center;
@@ -254,4 +261,51 @@ padding: 20px;
 .footer a:hover{
   color: white;
 cursor: crosshair
+}
+
+@media (max-width: 768px) {
+  .warn p{
+    display: block;
+    color: red;
+    animation: blink 1.5s step-start infinite;
+  }
+
+  .warnfooter p{
+    display: block;
+    color: rgb(255, 81, 0);
+    animation: blink 2.5s step-start infinite;
+  }
+
+  
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+    0%, 100% {
+      opacity: 1;
+    }
+  }
+  .weatherforecast {
+    grid-template-columns: repeat(1, 1fr);
+    margin: 20px;
+  }
+
+  .locationfinder{
+    flex-direction: column;
+  }
+  .burgeon {
+    flex-direction: column;
+  }
+  .weatherforecast .details {
+    margin: 5px;
+    padding: 10px;
+
+  }
+  .hourlyforecast {
+    grid-template-columns: repeat(1, 1fr);
+    margin: 20px;
+  }
+  .realtime{
+    grid-template-columns: repeat(4,1fr);
+  }
 }
