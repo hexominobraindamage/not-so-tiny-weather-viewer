@@ -5,9 +5,12 @@
     <title>Tiny Weather viewer</title>
     <link rel="stylesheet" href="./weather.css" />
     <link rel="shortcut icon" href="./icon.ico" type="image/x-icon" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Mochiy+Pop+P+One&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="container">
@@ -21,13 +24,20 @@
             type="text"
             id="location"
             get-location
-            placeholder="Enter a location"
+            placeholder="Enter a location to get started..."
           />
           <button id="searchBtn" get-location-button>Search</button>
         </div>
         <div class="hyperbloom">
           <button class="get-location-auto">Get Device location</button>
           <button class="refresh">Refresh</button>
+        </div>
+      </div>
+      <p style="text-align: center">Saved locations:</p>
+      <div class="saveddata">
+        <div class="savedlocations hide" style="display: none;">
+          <button id="jump-to">Check data</button>
+          <button id="delete-location">Delete location</button>
         </div>
       </div>
       <div class="electro-charged">
@@ -57,8 +67,7 @@
             <div class="extrastuff"><p class="sunset">Sunset: -?-</p></div>
             <div class="quicken">
               <button save-location>Save location</button>
-              <button get-saved-location>Get saved location</button>
-              <button clear-location>Clear save</button>
+              <button clear-location>Clear all saved locations</button>
             </div>
           </div>
           <div class="tartaglia">

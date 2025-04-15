@@ -8,7 +8,8 @@ const locationButton = document.querySelector("#searchBtn");
 const refreshButton = document.querySelector(".refresh");
 const saveButton = document.querySelector("[save-location]");
 const clearButton = document.querySelector("[clear-location]");
-const reloadButton = document.querySelector("[get-saved-location]");
+const reloadButton = document.querySelector("#jump-to");
+const deleteButton = document.querySelector("#delete-location");
 
 let lat, lon; // Declare global variables for latitude and longitude
 let tempmax, tempmin; // Declare global variables for max and min temperature
@@ -18,6 +19,7 @@ let countrycode = ""; // Declare countrycode variable
 
 document.addEventListener("DOMContentLoaded", () => {
   loadData();
+  
 });
 // Call loadData on page load to check for saved data
 locationInput.addEventListener("input", (e) => {
@@ -50,26 +52,41 @@ refreshButton.addEventListener("click", () => {
   getHourlyWeather(lat, lon);
 });
 
-reloadButton.addEventListener("click", () => {
+reloadButton.addEventListener("click", (e) => {
   document.querySelector(".crystalize").classList.remove("hide");
-  const savedLocationName = localStorage.getItem("locationName");
-  const savedLatLong = localStorage.getItem("latlong");
+  const savedLocations = JSON.parse(localStorage.getItem("savedLocations")) || [];
+  
+  if (e.target.closest("#jump-to")) {
+    const locationName = e.target.closest(".savedlocations").textContent.trim();
+    const selectedLocation = savedLocations.find(location => location.name === locationName);
 
-  if (savedLocationName && savedLatLong) {
-    const [savedLat, savedLon] = savedLatLong.split(",");
-    lat = parseFloat(savedLat); // Ensure lat and lon are numbers
-    lon = parseFloat(savedLon);
-    getWeather(lat, lon);
-    getForecast(lat, lon);
-    getRealTimeWeather(lat, lon);
-    getExtra(lat, lon);
-    getHourlyWeather(lat, lon);
+    if (selectedLocation) {
+      const [savedLat, savedLon] = selectedLocation.latlong.split(",");
+      lat = parseFloat(savedLat); // Ensure lat and lon are numbers
+      lon = parseFloat(savedLon);
+      getWeather(lat, lon);
+      getForecast(lat, lon);
+      getRealTimeWeather(lat, lon);
+      getExtra(lat, lon);
+      getHourlyWeather(lat, lon);
+    }
   } else {
-    document.querySelector("[get-saved-location]").classList.add("hide");
     document.querySelector(".crystalize").classList.add("hide");
   }
 });
 
+deleteButton.addEventListener("click", (e) => {
+  const savedLocations = JSON.parse(localStorage.getItem("savedLocations")) || [];
+  const locationElement = e.target.closest(".savedlocations");
+  if (locationElement) {
+    const locationName = locationElement.textContent.trim();
+    const updatedLocations = savedLocations.filter(location => location.name !== locationName);
+    localStorage.setItem("savedLocations", JSON.stringify(updatedLocations));
+    alert("Location deleted successfully!");
+    document.querySelector(".saveddata").innerHTML = ""; // Clear the saved locations display
+    loadData(); // Reload data to update the display
+  }
+});
 locationFetch.addEventListener("click", () => {
   document.querySelector(".crystalize").classList.remove("hide");
   navigator.geolocation.getCurrentPosition(
@@ -390,20 +407,36 @@ function getRealTimeWeather(lat, lon) {
 function saveData() {
   const locationName = document.querySelector("#locationName").textContent;
   const latlong = `${lat},${lon}`;
-  localStorage.setItem("locationName", locationName);
-  localStorage.setItem("latlong", latlong);
-  alert("Location saved successfully!");
-  document.querySelector("[clear-location]").classList.remove("hide"); // Show the refresh button after saving
-  document.querySelector("[get-saved-location]").classList.remove("hide");
+  const savedLocations =
+    JSON.parse(localStorage.getItem("savedLocations")) || [];
+
+  // Check if the location already exists in the saved locations
+  const isDuplicate = savedLocations.some(
+    (location) => location.name === locationName && location.latlong === latlong
+  );
+
+  if (!isDuplicate) {
+    savedLocations.push({ name: locationName, latlong });
+    localStorage.setItem("savedLocations", JSON.stringify(savedLocations));
+    alert("Location saved successfully!");
+  } else {
+    alert("This location is already saved.");
+  }
+  savedLocations.forEach((location) => {
+    document.querySelector(".saveddata").innerHTML += `<div class="savedlocations">${location.name}
+  <button id="jump-to">Check data</button> <button id="delete-location">Delete location </button> </div>`; // Show each saved location name
+  });
+  document.querySelector("[clear-location]").classList.remove("hide"); // Show the clear button after saving
 }
 
 function loadData() {
-  const locationName = localStorage.getItem("locationName");
-  const latlong = localStorage.getItem("latlong");
+  const savedLocations =
+    JSON.parse(localStorage.getItem("savedLocations")) || [];
 
-  if (locationName && latlong) {
-    document.querySelector("#locationName").textContent = locationName;
-    const [savedLat, savedLon] = latlong.split(",");
+  if (savedLocations.length > 0) {
+    const lastLocation = savedLocations[savedLocations.length - 1];
+    document.querySelector("#locationName").textContent = lastLocation.name;
+    const [savedLat, savedLon] = lastLocation.latlong.split(",");
     lat = parseFloat(savedLat); // Ensure lat and lon are numbers
     lon = parseFloat(savedLon);
     getWeather(lat, lon);
@@ -411,24 +444,38 @@ function loadData() {
     getRealTimeWeather(lat, lon);
     getExtra(lat, lon);
     getHourlyWeather(lat, lon);
+    savedLocations.forEach((location) => {
+      document.querySelector(".saveddata").innerHTML += `<div class="savedlocations">${location.name}
+  <button id="jump-to">Check data</button> <button id="delete-location">Delete location </button> </div>`; // Show each saved location name
+    });
   }
-  if (
-    !localStorage.getItem("locationName") &&
-    !localStorage.getItem("latlong")
-  ) {
+
+  if (savedLocations.length === 0) {
+    lat = 35.021041;
+    lon = 135.7556075;
+
+    getWeather(lat, lon);
+    getForecast(lat, lon);
+    getRealTimeWeather(lat, lon);
+    getExtra(lat, lon);
+    getHourlyWeather(lat, lon);
     clearButton.classList.add("hide");
   } else {
     clearButton.classList.remove("hide");
   }
-} // Call loadData on page load to check for saved data
+}
 
 function clearSave() {
-  localStorage.removeItem("locationName");
-  localStorage.removeItem("latlong");
+  localStorage.removeItem("savedLocations");
   locationInput.value = ""; // Clear the input field
   document.querySelector(".refresh").classList.remove("hide"); // Hide the refresh button
 
   clearButton.classList.add("hide");
-  document.querySelector("[get-saved-location]").classList.add("hide");
-  alert("Location cleared successfully!");
+  alert("All saved locations cleared successfully!");
+  const savedLocations = JSON.parse(localStorage.getItem("savedLocations")) || []; // Declare savedLocations
+  savedLocations.forEach((location) => {
+    document.querySelector(".saveddata").innerHTML += `<div class="savedlocations">${location.name}
+<button id="jump-to">Check data</button> <button id="delete-location">Delete location </button> </div>`; // Show each saved location name
+  });
+  document.querySelector(".saveddata").innerHTML = ""; // Clear the saved locations display
 }
