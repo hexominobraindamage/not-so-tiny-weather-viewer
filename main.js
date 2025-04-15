@@ -8,8 +8,8 @@ const locationButton = document.querySelector("#searchBtn");
 const refreshButton = document.querySelector(".refresh");
 const saveButton = document.querySelector("[save-location]");
 const clearButton = document.querySelector("[clear-location]");
-const reloadButton = document.querySelector("#jump-to");
-const deleteButton = document.querySelector("#delete-location");
+const reloadButton = document.querySelector(".jump-to");
+const deleteButton = document.querySelector(".delete-location");
 
 let lat, lon; // Declare global variables for latitude and longitude
 let tempmax, tempmin; // Declare global variables for max and min temperature
@@ -55,9 +55,10 @@ refreshButton.addEventListener("click", () => {
 reloadButton.addEventListener("click", (e) => {
   document.querySelector(".crystalize").classList.remove("hide");
   const savedLocations = JSON.parse(localStorage.getItem("savedLocations")) || [];
-  
-  if (e.target.closest("#jump-to")) {
-    const locationName = e.target.closest(".savedlocations").textContent.trim();
+  const locationElement = e.target.closest(".savedlocations");
+
+  if (locationElement) {
+    const locationName = locationElement.textContent.trim();
     const selectedLocation = savedLocations.find(location => location.name === locationName);
 
     if (selectedLocation) {
@@ -79,7 +80,7 @@ deleteButton.addEventListener("click", (e) => {
   const savedLocations = JSON.parse(localStorage.getItem("savedLocations")) || [];
   const locationElement = e.target.closest(".savedlocations");
   if (locationElement) {
-    const locationName = locationElement.textContent.trim();
+    const locationName = locationElement.querySelector(".location-name")?.textContent.trim() || locationElement.textContent.trim();
     const updatedLocations = savedLocations.filter(location => location.name !== locationName);
     localStorage.setItem("savedLocations", JSON.stringify(updatedLocations));
     alert("Location deleted successfully!");
@@ -422,6 +423,7 @@ function saveData() {
   } else {
     alert("This location is already saved.");
   }
+  document.querySelector(".saveddata").innerHTML = ""; // Clear the saved locations display
   savedLocations.forEach((location) => {
     document.querySelector(".saveddata").innerHTML += `<div class="savedlocations">${location.name}
   <button id="jump-to">Check data</button> <button id="delete-location">Delete location </button> </div>`; // Show each saved location name
@@ -444,6 +446,7 @@ function loadData() {
     getRealTimeWeather(lat, lon);
     getExtra(lat, lon);
     getHourlyWeather(lat, lon);
+    document.querySelector(".saveddata").innerHTML = ""; 
     savedLocations.forEach((location) => {
       document.querySelector(".saveddata").innerHTML += `<div class="savedlocations">${location.name}
   <button id="jump-to">Check data</button> <button id="delete-location">Delete location </button> </div>`; // Show each saved location name
@@ -472,7 +475,8 @@ function clearSave() {
 
   clearButton.classList.add("hide");
   alert("All saved locations cleared successfully!");
-  const savedLocations = JSON.parse(localStorage.getItem("savedLocations")) || []; // Declare savedLocations
+  const savedLocations = JSON.parse(localStorage.getItem("savedLocations")) || []; 
+  document.querySelector(".saveddata").innerHTML = ""; // Declare savedLocations
   savedLocations.forEach((location) => {
     document.querySelector(".saveddata").innerHTML += `<div class="savedlocations">${location.name}
 <button id="jump-to">Check data</button> <button id="delete-location">Delete location </button> </div>`; // Show each saved location name
